@@ -41,8 +41,24 @@ BASE_VERSION = load_information_from_description_file('base')['version']
 def str2tuple(s):
     return eval('tuple(%s)' % (s or ''))
 
+def add_week_days(week_days_to_add):
+    num_whole_weeks  = week_days_to_add / 5
+    extra_days       = num_whole_weeks * 2
+
+    first_weekday    = datetime.now().weekday()
+    remainder_days   = week_days_to_add % 5
+
+    natural_day      = first_weekday + remainder_days
+    if natural_day > 4:
+        if first_weekday == 5:
+            extra_days += 1
+        elif first_weekday != 6:
+            extra_days += 2
+
+    return relativedelta(days=week_days_to_add + extra_days)
+
 _intervalTypes = {
-    'work_days': lambda interval: relativedelta(days=interval),
+    'work_days': lambda interval: add_week_days(week_days_to_add=interval),
     'days': lambda interval: relativedelta(days=interval),
     'hours': lambda interval: relativedelta(hours=interval),
     'weeks': lambda interval: relativedelta(days=7*interval),
